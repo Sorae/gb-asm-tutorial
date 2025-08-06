@@ -1,4 +1,3 @@
-
 ; ANCHOR: bullets-top
 include "src/main/utils/hardware.inc"
 include "src/main/utils/constants.inc"
@@ -172,15 +171,19 @@ UpdateBullets_PerBullet_SpawnDeactivatedBullet:
     rr b
     
     ; Set the x position to equal the player's x position
+    ; + a 4 pixel offset to be center in front of the player
     ld a, b
+    add 4
     ld [hli], a
-
-    ; Set the y position (low)
+    
+    ; Set the y position to the player's y position
+    ; minus a 8 pixel offset so the bullet is in front of the player
     ld a, [wPlayerPositionY]
+    sub $80 ; 8 pixel in Q12.4 format
     ld [hli], a
-
-    ; Set the y position (high)
+    ; Handle carry to high byte if needed
     ld a, [wPlayerPositionY+1]
+    sbc 0
     ld [hli], a
 
     pop hl
