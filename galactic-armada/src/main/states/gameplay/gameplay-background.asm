@@ -38,14 +38,14 @@ InitializeBackground::
 ; This is called during gameplay state on every frame
 UpdateBackground::
 
-	; Increase our scaled integer by 5
+	; Decrease our scaled integer by 5
 	; Get our true (non-scaled) value, and save it for later usage in bc
 	ld a, [mBackgroundScroll]
-	add a, 5
+	sub a, 5
     ld b, a
 	ld [mBackgroundScroll], a
 	ld a, [mBackgroundScroll+1]
-	adc 0
+	sbc 0
     ld c, a
 	ld [mBackgroundScroll+1], a
 ; ANCHOR_END: gameplay-background-update-start
