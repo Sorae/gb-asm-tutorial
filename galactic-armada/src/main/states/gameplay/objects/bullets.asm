@@ -39,7 +39,7 @@ InitializeBullets::
     xor a
     ld [wSpawnBullet], a
 
-    ; Copy the bullet tile data intto vram
+    ; Copy the bullet tile data into vram
 	ld de, bulletTileData
 	ld hl, BULLET_TILES_START
 	ld bc, bulletTileDataEnd - bulletTileData
@@ -47,14 +47,16 @@ InitializeBullets::
 
     ; Reset how many bullets are active to 0
     xor a
-    ld [wActiveBulletCounter],a
+    ld [wActiveBulletCounter], a
 
     ld b, a
     ld hl, wBullets
-    ld [hl], a
+    
 
 InitializeBullets_Loop:
-
+    ; set bullet as inactive
+    xor a
+    ld [hl], a
     ; Increase the address
     ld a, l
     add PER_BULLET_BYTES_COUNT
@@ -63,7 +65,7 @@ InitializeBullets_Loop:
     adc 0
     ld h, a
 
-    ; Increase how many bullets we have initailized
+    ; Increase how many bullets we have initialized
     ld a, b
     inc a
     ld b, a
