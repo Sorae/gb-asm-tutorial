@@ -137,36 +137,8 @@ UpdatePlayer_UpdateSprite_StopFlashing:
 
 ; ANCHOR: player-update-sprite
 UpdatePlayer_UpdateSprite:
-
-    ; Get the unscaled player x position in b
-    ld a, [wPlayerPositionX+0]
-    ld b, a
-    ld a, [wPlayerPositionX+1]
-    ld d, a
-    
-    srl d
-    rr b
-    srl d
-    rr b
-    srl d
-    rr b
-    srl d
-    rr b
-
-    ; Get the unscaled player y position in c
-    ld a, [wPlayerPositionY+0]
-    ld c, a
-    ld a, [wPlayerPositionY+1]
-    ld e, a
-
-    srl e
-    rr c
-    srl e
-    rr c
-    srl e
-    rr c
-    srl e
-    rr c
+    call UnscaledXToB
+    call UnscaledYToC
     
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; Drawing the palyer metasprite
@@ -210,9 +182,6 @@ TryShoot:
 
 ; ANCHOR: player-damage
 DamagePlayer::
-
-    
-
     xor a
     ld [mPlayerFlash], a
     inc a
@@ -227,6 +196,11 @@ DamagePlayer::
 
 ; ANCHOR: player-movement
 MoveUp:
+    ; check player position against the top of the play field
+    call UnscaledYToC
+    ld a, c
+    cp 24 ; screen top padding (16) + score window height (8)
+    ret c
 
     ; decrease the player's y position
     ld a, [wPlayerPositionY]
@@ -240,6 +214,13 @@ MoveUp:
     ret
 
 MoveDown:
+    ; check player position against the bottom of the play field
+    ld a, SCRN_Y 
+    ld b, a ; b = screen height + screen top padding (16) - player ship height (16)
+    call UnscaledYToC
+    ld a, c
+    cp b 
+    ret nc
 
     ; increase the player's y position
     ld a, [wPlayerPositionY]
@@ -253,6 +234,11 @@ MoveDown:
     ret
 
 MoveLeft:
+    ; check player position against the left edge of the play field
+    call UnscaledXToB
+    ld a, b
+    cp 8 ; screen left padding  
+    ret c
 
     ; decrease the player's x position
     ld a, [wPlayerPositionX]
@@ -265,6 +251,14 @@ MoveLeft:
     ret
 
 MoveRight:
+    ; check player position against the right edge of the play field
+    ld a, SCRN_X
+    sub 8
+    ld c, a ; c = screen width + screen left padding (8) - player ship width (16)
+    call UnscaledXToB
+    ld a, b
+    cp c 
+    ret nc
 
     ; increase the player's x position
     ld a, [wPlayerPositionX]
@@ -278,4 +272,38 @@ MoveRight:
     ret
 ; ANCHOR_END: player-movement
 
+; Get the unscaled player x position in b
+UnscaledXToB:
+    ld a, [wPlayerPositionX+0]
+    ld b, a
+    ld a, [wPlayerPositionX+1]
+    ld d, a
+    
+    srl d
+    rr b
+    srl d
+    rr b
+    srl d
+    rr b
+    srl d
+    rr b
+    ret
 
+; Get the unscaled player y position in c
+UnscaledYToC:
+    ld a, [wPlayerPositionY+0]
+    ld c, a
+    ld a, [wPlayerPositionY+1]
+    ld e, a
+
+    srl e
+    rr c
+    srl e
+    rr c
+    srl e
+    rr c
+    srl e
+    rr c
+    ld a, c
+    
+    ret
